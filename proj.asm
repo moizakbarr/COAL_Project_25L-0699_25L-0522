@@ -7,6 +7,8 @@ call draw_sky
 call draw_ground
 call draw_bar
 call draw_road
+call draw_lanes
+call draw_cars
 call draw_bonnet
 call draw_dashboard
 call draw_wheel
@@ -353,7 +355,119 @@ spoke_row:
 	pop ax
 	pop es
 	ret
-	
+	draw_rect:
+	push es
+	push ax
+	push cx
+	push dx
+	push di
+	mov cx, 0xa000
+	mov es, cx
+	cld
+	rect_row:
+		mov cx, bx
+		push di
+		rep stosb
+		pop di
+		add di, 320
+		dec dx
+		jnz rect_row
+	pop di
+	pop dx
+	pop cx
+	pop ax
+	pop es
+	ret
+draw_lanes:
+	push es
+	push ax
+	push bx
+	push cx
+	push dx
+	push di
+	mov ax, 0xa000
+	mov es, ax
+	mov bx, 93
+	lane_row:
+		test bx, 4
+		jnz lane_skip
+		mov ax, bx
+		sub ax, 73
+		xor dx, dx
+		mov cx, 3
+		div cx
+		mov di, bx
+		shl di, 6
+		mov dx, bx
+		shl dx, 8
+		add di, dx
+		add di, 160
+		sub di, ax
+		mov word [es:di], 0f0fh
+		add di, ax
+		add di, ax
+		mov word [es:di], 0f0fh
+	lane_skip:
+		inc bx
+		cmp bx, 145
+		jne lane_row
+	pop di
+	pop dx
+	pop cx
+	pop bx
+	pop ax
+	pop es
+	ret
+draw_cars:
+	push ax
+	push bx
+	push dx
+	push di
+	mov di, 115*320+120
+	mov bx, 20
+	mov dx, 14
+	mov al, 01h
+	call draw_rect
+	mov di, 117*320+123
+	mov bx, 14
+	mov dx, 5
+	mov al, 00h
+	call draw_rect
+	mov di, 125*320+121
+	mov bx, 3
+	mov dx, 2
+	mov al, 04h
+	call draw_rect
+	mov di, 125*320+136
+	mov bx, 3
+	mov dx, 2
+	mov al, 04h
+	call draw_rect
+	mov di, 100*320+155
+	mov bx, 10
+	mov dx, 6
+	mov al, 03h
+	call draw_rect
+	mov di, 101*320+157
+	mov bx, 6
+	mov dx, 2
+	mov al, 00h
+	call draw_rect
+	mov di, 104*320+155
+	mov bx, 2
+	mov dx, 2
+	mov al, 04h
+	call draw_rect
+	mov di, 104*320+163
+	mov bx, 2
+	mov dx, 2
+	mov al, 04h
+	call draw_rect
+	pop di
+	pop dx
+	pop bx
+	pop ax
+	ret
 	
 	
 	
